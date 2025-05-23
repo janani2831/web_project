@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Daily Quote Generator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
+  <style>
+    :root {
+      --color-primary: #1a2a6c;   /* Dark navy blue */
+      --color-primary-light: #273c75; /* Slightly lighter navy */
+      --color-bg: #f9fbfd;        /* Very light grey-blue */
+      --color-quote-bg: #ffffff;  /* Pure white */
+      --color-text-primary: #222831; /* Dark charcoal */
+      --color-accent: #4b6584;    /* Muted steel blue */
+      --color-button-bg: #1a2a6c;
+      --color-button-hover: #273c75;
+      --color-wave: #1a2a6c;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-bg);
+      color: var(--color-text-primary);
+      padding: 1rem;
+    }
+    h1 {
+      font-weight: 700;
+      font-size: 2.8rem;
+      color: var(--color-primary);
+      margin-bottom: 1rem;
+      user-select: none;
+      text-shadow: 0 2px 6px rgba(26,42,108,0.25);
+    }
+    #container {
+      background: var(--color-quote-bg);
+      padding: 3rem 4rem;
+      border-radius: 1.5rem;
+      box-shadow: 0 12px 30px rgba(26, 42, 108, 0.1);
+      max-width: 600px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+      max-width: 600px;
+    }
+    blockquote {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      line-height: 1.5;
+      margin: 0;
+      min-height: 130px;
+      position: relative;
+      user-select: text;
+      font-style: italic;
+    }
+    blockquote::before {
+      content: '“';
+      font-size: 3.5rem;
+      color: var(--color-accent);
+      position: absolute;
+      top: -12px;
+      left: -18px;
+      font-weight: 900;
+      opacity: 0.3;
+    }
+    blockquote::after {
+      content: '”';
+      font-size: 3.5rem;
+      color: var(--color-accent);
+      position: absolute;
+      bottom: -25px;
+      right: -18px;
+      font-weight: 900;
+      opacity: 0.3;
+    }
+    #nextBtn {
+      margin-top: 2rem;
+      padding: 0.75rem 2.5rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 50px;
+      background: var(--color-button-bg);
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.2s ease;
+      user-select: none;
+      box-shadow: 0 5px 15px rgba(26,42,108,0.3);
+    }
+    #nextBtn:hover {
+      background: var(--color-button-hover);
+      transform: scale(1.05);
+      box-shadow: 0 7px 20px rgba(39,60,117,0.5);
+    }
+    /* Animated background wave */
+    .wave {
+      position: absolute;
+      bottom: -25%;
+      left: -10%;
+      width: 120%;
+      height: 50%;
+      background: var(--color-wave);
+      border-radius: 50%;
+      animation: wave 6s infinite linear;
+      opacity: 0.08;
+      pointer-events: none;
+      filter: blur(12px);
+    }
+
+    @keyframes wave {
+      0% {
+        transform: translateX(0) translateY(0) rotate(0deg);
+      }
+      50% {
+        transform: translateX(10%) translateY(10%) rotate(180deg);
+      }
+      100% {
+        transform: translateX(0) translateY(0) rotate(360deg);
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Quotes Generator</h1>
+  <div id="container">
+    <div class="wave"></div>
+    <blockquote id="quote">Loading inspirational thoughts…</blockquote>
+    <button id="nextBtn">Next Quote</button>
+  </div>
+
+  <script>
+    const quotes = [
+      'The only way to do great work is to love what you do. – Steve Jobs',
+      "Believe you can and you're halfway there. – Theodore Roosevelt",
+      "Your time is limited, so don't waste it living someone else's life. – Steve Jobs",
+      'Act as if what you do makes a difference. It does. – William James',
+      'Success is not final, failure is not fatal: It is the courage to continue that counts. – Winston Churchill',
+      'The future belongs to those who believe in the beauty of their dreams. – Eleanor Roosevelt',
+      "Don't watch the clock; do what it does. Keep going. – Sam Levenson",
+      'Everything you can imagine is real. – Pablo Picasso',
+      'Hardships often prepare ordinary people for an extraordinary destiny. – C.S. Lewis',
+      'The best time to plant a tree was 20 years ago. The second best time is now. – Chinese Proverb'
+    ];
+
+    const quoteEl = document.getElementById('quote');
+    const nextBtn = document.getElementById('nextBtn');
+
+    function getRandomQuote(prevQuote) {
+      let quote = prevQuote;
+      while (quote === prevQuote) {
+        quote = quotes[Math.floor(Math.random() * quotes.length)];
+      }
+      return quote;
+    }
+
+    function showQuote() {
+      const newQuote = getRandomQuote(quoteEl.textContent);
+      gsap
+        .timeline()
+        .to(quoteEl, { duration: 0.4, y: -20, opacity: 0, ease: 'power2.in' })
+        .add(() => {
+          quoteEl.textContent = newQuote;
+        })
+        .fromTo(
+          quoteEl,
+          { y: 20, opacity: 0 },
+          { duration: 0.6, y: 0, opacity: 1, ease: 'elastic.out(1, 0.5)' }
+        );
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      showQuote();
+    });
+
+    nextBtn.addEventListener('click', showQuote);
+  </script>
+</body>
+</html>
+
